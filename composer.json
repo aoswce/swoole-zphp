@@ -1,11 +1,11 @@
 {
-    "name": "keaixiaou/zphp",
+    "name": "aoswce/zphp",
     "description": "Asynchronous non-blocking framework based on ZPHP transformation",
     "authors": [
         {
-            "name": "huaerjie",
-            "email": "286252682@qq.com",
-            "homepage":"https://github.com/keaixiaou"
+            "name": "aoswce",
+            "email": "aoswce@126.com",
+            "homepage":"https://github.com/aoswce"
         }
     ],
     "license": "MIT",
