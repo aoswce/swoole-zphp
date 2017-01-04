@@ -14,8 +14,6 @@ use ZPHP\Socket\Callback\Swoole as CSwoole;
 abstract class SwooleHttp extends CSwoole
 {
 
-    protected $currentResponse;
-
     public function onReceive()
     {
         throw new \Exception('http server must use onRequest');
@@ -24,7 +22,6 @@ abstract class SwooleHttp extends CSwoole
     public function onWorkerStart($server, $workerId)
     {
         parent::onWorkerStart($server, $workerId);
-        Protocol\Request::setHttpServer(1);
         set_error_handler(array($this, 'onErrorHandle'), E_USER_ERROR);
         register_shutdown_function(array($this, 'onErrorShutDown'));
     }
@@ -78,7 +75,6 @@ abstract class SwooleHttp extends CSwoole
 
     public function errorResponse($error){
         $errorMsg = DEBUG===true?"{$error['message']} ({$error['file']}:{$error['line']})":'application internal error!';
-        Log::write('errorResponse:'.$errorMsg);
         echo "errorResponse:".$errorMsg;
         $this->afterResponese();
     }
@@ -88,4 +84,20 @@ abstract class SwooleHttp extends CSwoole
     }
 
     abstract public function onRequest($request, $response);
+
+    public function onTask($server, $taskId, $fromId, $data)
+    {
+        if(empty($data['class']) || empty($data['method']) || empty($data['param'])){
+            return null;
+        }
+        try{
+            $res = call_user_func_array([$data['class'], $data['method']], $data['param']);
+            return ['result'=>$res];
+        }catch(\Exception $e){
+            return ['exception'=>$e->getMessage()];
+        }
+
+
+
+    }
 }

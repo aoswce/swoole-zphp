@@ -10,6 +10,7 @@
 namespace ZPHP\Core;
 
 use ZPHP\Common\Dir;
+use ZPHP\ZPHP;
 
 abstract class App{
 
@@ -42,7 +43,7 @@ abstract class App{
                 }
             }
         }catch(\Exception $e){
-            Log::write($e->getMessage());
+            echo $e->getMessage()."\n";
         }
     }
 
@@ -53,7 +54,7 @@ abstract class App{
      * @throws \Exception
      */
     static public function initDefaultList($type, &$allList){
-        $dir = APPPATH.DS.$type;
+        $dir = ZPHP::getAppPath().DS.$type;
         if(is_dir($dir)) {
             $classList = Dir::getClass($dir, '/.php$/');
             foreach($classList as $key => $value){

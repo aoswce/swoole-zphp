@@ -76,6 +76,7 @@ class Request{
      */
     protected function executeGeneratorScheduler(Controller $controller){
         $action = 'coroutineStart';
+        $returnRes = 'NULL';
         try{
             $generator = call_user_func([$controller, $action]);
             if ($generator instanceof \Generator) {
@@ -84,14 +85,14 @@ class Request{
                 $task->setRoutine($generator);
                 $task->work($task->getRoutine());
             }else{
-                return $generator;
+                $returnRes = $generator;
             }
         }catch(\Exception $e){
             $this->response->status(500);
             $msg = DEBUG===true?$e->getMessage():'服务器升空了!';
             echo Swoole::info($msg);
         }
-        return 'NULL';
+        return $returnRes;
     }
     /**
      * 默认mvc模式
@@ -102,9 +103,10 @@ class Request{
         if(!empty(Config::getField('project','reload')) && extension_loaded('runkit')){
             App::clear($controllerClass, 'controller');
         }
-        $FController = App::controller($controllerClass);
-        if(empty($FController)){
-            throw new \Exception(404);
+        try {
+            $FController = App::controller($controllerClass);
+        }catch(\Exception $e) {
+            throw new \Exception('404|'.$e->getMessage());
         }
         $controller = clone $FController;
         $action = $mvc['action'];
